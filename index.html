@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,8 +9,10 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=JetBrains+Mono:wght@300;400;700&display=swap"
+        rel="stylesheet">
+
     <!-- Three.js & html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -35,18 +38,69 @@
             --black: #ffffff;
             --white: #1a1a1a;
             --grey: #555;
-            --accent: #009eb3; 
+            --accent: #009eb3;
             --glass-bg: rgba(255, 255, 255, 0.65);
             --glass-border: rgba(0, 0, 0, 0.15);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: var(--mono);
             background: var(--bg);
             color: var(--white);
-            cursor: crosshair;
+            cursor: none;
+        }
+
+        a,
+        button,
+        .crt-btn,
+        .theme-btn {
+            cursor: none;
+        }
+
+        /* ============================================
+         *  CUSTOM CURSOR
+         * ============================================ */
+        .custom-cursor-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 100000;
+            transform: translate(-50%, -50%);
+        }
+
+        .custom-cursor-outline {
+            width: 30px;
+            height: 30px;
+            border: 1px solid var(--accent);
+            border-radius: 50%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 100000;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        }
+
+        .custom-cursor-outline.hover {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(0, 229, 255, 0.1);
+        }
+
+        [data-theme="light"] .custom-cursor-outline.hover {
+            background-color: rgba(0, 158, 179, 0.1);
         }
 
         /* ============================================
@@ -54,19 +108,30 @@
          * ============================================ */
         #webgl-container {
             position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             z-index: 9999;
-            pointer-events: none; /* Let clicks pass to the invisible DOM underneath */
+            pointer-events: none;
+            /* Let clicks pass to the invisible DOM underneath */
         }
 
         /* Initial loader before WebGL kicks in */
         #loader {
             position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            color: var(--white);
-            font-size: 1.2rem;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-family: var(--mono);
+            font-size: 1rem;
+            letter-spacing: 2px;
             z-index: 10000;
         }
 
@@ -84,17 +149,27 @@
             padding: 0 2rem;
         }
 
-        section { padding: 5rem 0; }
+        section {
+            padding: 5rem 0;
+        }
 
-        a { color: var(--accent); text-decoration: none; }
-        a:hover { text-decoration: underline; }
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
 
         /* ============================================
          *  NAVIGATION
          * ============================================ */
         nav {
             position: absolute;
-            top: 0; left: 0; right: 0;
+            top: 0;
+            left: 0;
+            right: 0;
             padding: 1.2rem 2rem;
             display: flex;
             justify-content: space-between;
@@ -103,57 +178,237 @@
             border-bottom: 1px solid var(--glass-border);
         }
 
-        .nav-logo { font-family: var(--gothic); font-size: 1.8rem; }
-        .nav-links { display: flex; gap: 2rem; }
-        .nav-links a { color: var(--grey); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; }
-        .nav-links a:hover { color: var(--accent); }
+        .nav-logo {
+            font-family: var(--gothic);
+            font-size: 1.8rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--grey);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
 
         .theme-btn {
-            background: none; border: 1px solid var(--glass-border); color: var(--white);
-            font-size: 0.85rem; font-family: var(--mono); font-weight: 700;
-            letter-spacing: 1px; cursor: pointer; padding: 0.4rem 0.8rem;
-            border-radius: 4px; margin-left: 1rem;
+            background: none;
+            border: 1px solid var(--glass-border);
+            color: var(--white);
+            font-size: 0.85rem;
+            font-family: var(--mono);
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            margin-left: 1rem;
         }
 
         /* ============================================
          *  HERO SECTION
          * ============================================ */
-        .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .hero-initial { font-family: var(--gothic); font-size: clamp(10rem, 20vw, 18rem); color: var(--white); line-height: 1; margin-bottom: 5rem; text-shadow: 0 0 10px rgba(224,224,224,0.5); }
-        .hero-title { font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 700; letter-spacing: 3px; margin-bottom: 1.5rem; text-shadow: 0 0 5px rgba(224,224,224,0.3); }
-        .hero-subtitle { font-size: 1rem; font-weight: 300; color: var(--grey); max-width: 550px; line-height: 1.8; margin-bottom: 3rem; }
-        .hero-subtitle span { color: var(--white); font-weight: 700; }
-        .btn-group { display: flex; gap: 1.5rem; flex-wrap: wrap; justify-content: center; }
-        .crt-btn { display: inline-block; padding: 0.8rem 2.2rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border: 1px solid var(--accent); color: var(--accent); }
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding-top: 8rem;
+        }
+
+        .hero-initial {
+            font-family: var(--gothic);
+            font-size: clamp(10rem, 20vw, 18rem);
+            color: var(--white);
+            line-height: 1;
+            margin-bottom: 5rem;
+            text-shadow: 0 0 10px rgba(224, 224, 224, 0.5);
+        }
+
+        .hero-title {
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            font-weight: 700;
+            letter-spacing: 3px;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 5px rgba(224, 224, 224, 0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+            font-weight: 300;
+            color: var(--grey);
+            max-width: 550px;
+            line-height: 1.8;
+            margin-bottom: 3rem;
+        }
+
+        .hero-subtitle span {
+            color: var(--white);
+            font-weight: 700;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .crt-btn {
+            display: inline-block;
+            padding: 0.8rem 2.2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
 
         /* ============================================
          *  SECTIONS
          * ============================================ */
-        .section-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 4px; color: var(--grey); margin-bottom: 0.5rem; }
-        .section-title { font-size: 2rem; margin-bottom: 2.5rem; }
-        .about-text { font-size: 1rem; font-weight: 300; color: var(--grey); line-height: 2; max-width: 700px; }
-        .about-text strong { color: var(--white); font-weight: 700; }
-        
-        .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; }
-        .project-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px; padding: 2.5rem 2rem; }
-        .project-card h3 { font-size: 1.3rem; margin-bottom: 0.8rem; font-weight: 700; }
-        .project-card p { color: var(--grey); font-size: 0.88rem; line-height: 1.7; margin-bottom: 1.5rem; font-weight: 300; }
-        .project-tags { display: flex; gap: 0.6rem; margin-bottom: 1.5rem; }
-        .ptag { font-size: 0.72rem; letter-spacing: 1px; text-transform: uppercase; padding: 0.25rem 0.7rem; border: 1px solid rgba(0, 229, 255, 0.2); border-radius: 3px; color: var(--accent); }
+        .section-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--grey);
+            margin-bottom: 0.5rem;
+        }
 
-        .skills-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2rem; margin-top: 1rem; }
-        .skill-col h4 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 3px; color: var(--accent); margin-bottom: 1rem; }
-        .skill-col ul { list-style: none; }
-        .skill-col li { color: var(--white); font-size: 0.95rem; padding: 0.4rem 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
-        .skill-col li::before { content: '› '; color: var(--accent); }
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 2.5rem;
+        }
 
-        footer { padding: 5rem 0 3rem; text-align: center; border-top: 1px solid var(--glass-border); }
-        .footer-links { display: flex; justify-content: center; gap: 3rem; margin: 2rem 0 3rem; flex-wrap: wrap; }
-        .footer-links a { font-size: 0.9rem; color: var(--grey); letter-spacing: 1px; }
-        .divider { width: 60px; height: 1px; background: var(--glass-border); margin: 0 auto 3rem; }
+        .about-text {
+            font-size: 1rem;
+            font-weight: 300;
+            color: var(--grey);
+            line-height: 2;
+            max-width: 700px;
+        }
+
+        .about-text strong {
+            color: var(--white);
+            font-weight: 700;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .project-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 2.5rem 2rem;
+        }
+
+        .project-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+        }
+
+        .project-card p {
+            color: var(--grey);
+            font-size: 0.88rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            font-weight: 300;
+        }
+
+        .project-tags {
+            display: flex;
+            gap: 0.6rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .ptag {
+            font-size: 0.72rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 0.25rem 0.7rem;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 3px;
+            color: var(--accent);
+        }
+
+        .skills-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .skill-col h4 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .skill-col ul {
+            list-style: none;
+        }
+
+        .skill-col li {
+            color: var(--white);
+            font-size: 0.95rem;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .skill-col li::before {
+            content: '› ';
+            color: var(--accent);
+        }
+
+        footer {
+            padding: 5rem 0 3rem;
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin: 2rem 0 3rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            font-size: 0.9rem;
+            color: var(--grey);
+            letter-spacing: 1px;
+        }
+
+        .divider {
+            width: 60px;
+            height: 1px;
+            background: var(--glass-border);
+            margin: 0 auto 3rem;
+        }
     </style>
 </head>
-<body>
+
+<body data-theme="light">
+    <div class="custom-cursor-dot"></div>
+    <div class="custom-cursor-outline"></div>
 
     <div id="loader">INITIALIZING WEBGL FRAGMENT SHADER...</div>
     <div id="webgl-container"></div>
@@ -168,14 +423,16 @@
                 <a href="#projects">Projects</a>
                 <a href="#contact">Contact</a>
                 <!-- The theme toggle visually won't update post-capture in pure WebGL, but structurally remains -->
-                <button id="theme-toggle" class="theme-btn">[ MODE: DARK ]</button>
+                <button id="theme-toggle" class="theme-btn">[ MODE: LIGHT ]</button>
             </div>
         </nav>
 
         <section class="hero container">
             <div class="hero-initial">M</div>
-            <h1 class="hero-title">leafS</h1>
-            <p class="hero-subtitle">Full-Stack Developer engineering high-performance systems with <span>Flutter</span>, <span>FastAPI</span>, & <span>Firebase</span>.</p>
+            <h1 class="hero-title">Mo7</h1>
+            <p class="hero-subtitle">Full-Stack Developer engineering high-performance systems with
+                <span>Flutter</span>, <span>FastAPI</span>, & <span>Firebase</span>.
+            </p>
             <div class="btn-group">
                 <a href="#projects" class="crt-btn">View Portfolio</a>
                 <a href="#contact" class="crt-btn">Contact Me</a>
@@ -185,7 +442,12 @@
         <section id="about" class="container">
             <p class="section-label">// 001</p>
             <h2 class="section-title">About</h2>
-            <p class="about-text">I specialize in building <strong>end-to-end mobile and web applications</strong>. My work revolves around bridging <strong>sleek, pixel-perfect frontends</strong> built with Flutter with <strong>robust, asynchronous Python backends</strong> powered by FastAPI. I leverage Firebase for real-time data, authentication, and cloud infrastructure to deliver fast, scalable, and reliable products.</p>
+            <p class="about-text">I specialize in building <strong>end-to-end mobile and web applications</strong>. My
+                work revolves around bridging <strong>sleek, pixel-perfect frontends</strong> built with Flutter with
+                <strong>robust, asynchronous Python backends</strong> powered by FastAPI. I leverage Firebase for
+                real-time data, authentication, and cloud infrastructure to deliver fast, scalable, and reliable
+                products.
+            </p>
         </section>
 
         <div class="divider"></div>
@@ -196,15 +458,28 @@
             <div class="skills-row">
                 <div class="skill-col">
                     <h4>Frontend</h4>
-                    <ul><li>Flutter (Mobile / Web)</li><li>Dart</li><li>HTML5 / CSS3</li></ul>
+                    <ul>
+                        <li>Flutter (Mobile / Web)</li>
+                        <li>Dart</li>
+                        <li>HTML5 / CSS3</li>
+                    </ul>
                 </div>
                 <div class="skill-col">
                     <h4>Backend</h4>
-                    <ul><li>FastAPI</li><li>Python 3</li><li>RESTful API Design</li><li>Async / Await</li></ul>
+                    <ul>
+                        <li>FastAPI</li>
+                        <li>Python 3</li>
+                        <li>RESTful API Design</li>
+                        <li>Async / Await</li>
+                    </ul>
                 </div>
                 <div class="skill-col">
                     <h4>Cloud</h4>
-                    <ul><li>Firebase Auth</li><li>Cloud Firestore</li><li>Firebase Hosting</li></ul>
+                    <ul>
+                        <li>Firebase Auth</li>
+                        <li>Cloud Firestore</li>
+                        <li>Firebase Hosting</li>
+                    </ul>
                 </div>
             </div>
         </section>
@@ -217,14 +492,17 @@
             <div class="projects-grid">
                 <div class="project-card">
                     <h3>[Project Title 1]</h3>
-                    <p>A cross-platform mobile application with real-time data synchronization and a fluid, gesture-driven UI.</p>
+                    <p>A cross-platform mobile application with real-time data synchronization and a fluid,
+                        gesture-driven UI.</p>
                     <div class="project-tags"><span class="ptag">#Flutter</span><span class="ptag">#FastAPI</span></div>
                     <a href="https://github.com/yourproject1" class="link">github.com/yourproject &rarr;</a>
                 </div>
                 <div class="project-card">
                     <h3>[Project Title 2]</h3>
-                    <p>An admin dashboard with real-time Firestore analytics, role-based authentication, and a comprehensive NoSQL data management layer.</p>
-                    <div class="project-tags"><span class="ptag">#Flutter</span><span class="ptag">#Firebase</span></div>
+                    <p>An admin dashboard with real-time Firestore analytics, role-based authentication, and a
+                        comprehensive NoSQL data management layer.</p>
+                    <div class="project-tags"><span class="ptag">#Flutter</span><span class="ptag">#Firebase</span>
+                    </div>
                     <a href="https://github.com/yourproject2" class="link">github.com/yourproject &rarr;</a>
                 </div>
             </div>
@@ -252,10 +530,10 @@
         window.addEventListener('load', () => {
             if (document.fonts) {
                 document.fonts.ready.then(() => {
-                    setTimeout(initWebGL, 100); 
+                    setTimeout(initWebGL, 100);
                 });
             } else {
-                setTimeout(initWebGL, 800); 
+                setTimeout(initWebGL, 800);
             }
         });
 
@@ -267,7 +545,7 @@
             // 1. Setup Three.js Scene
             const scene = new THREE.Scene();
             const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-            
+
             const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
@@ -290,19 +568,20 @@
                 u_ratio: { value: window.innerHeight / pageHeight },
                 u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
                 u_mouse: { value: new THREE.Vector2(0.5, 0.5) },
-                u_hover: { value: 0.0 }
+                u_hover: { value: 0.0 },
+                u_tv_on: { value: 0.0 }
             };
 
-                const material = new THREE.ShaderMaterial({
-                    uniforms: uniforms,
-                    vertexShader: `
+            const material = new THREE.ShaderMaterial({
+                uniforms: uniforms,
+                vertexShader: `
                         varying vec2 vUv;
                         void main() {
                             vUv = uv;
                             gl_Position = vec4(position, 1.0);
                         }
                     `,
-                    fragmentShader: `
+                fragmentShader: `
                         uniform sampler2D tDiffuse;
                         uniform float u_time;
                         uniform float u_scroll;
@@ -310,6 +589,7 @@
                         uniform vec2 u_resolution;
                         uniform vec2 u_mouse;
                         uniform float u_hover;
+                        uniform float u_tv_on;
                         varying vec2 vUv;
 
                         // Convex Lens Barrel Distortion
@@ -384,96 +664,194 @@
                             float dist = distance(vUv, vec2(0.5));
                             color.rgb *= smoothstep(0.9, 0.2, dist);
 
+                            // 8. TV On Effect
+                            if (u_tv_on < 1.0) {
+                                vec2 cc = vUv - 0.5;
+                                float openX = smoothstep(0.0, 0.15, u_tv_on); // Horizontal line opens fast
+                                float openY = smoothstep(0.15, 1.0, u_tv_on); // Then vertical opens
+                                
+                                if (abs(cc.x) > openX * 0.5 || abs(cc.y) > openY * 0.5) {
+                                    color.rgb = vec3(0.0);
+                                } else {
+                                    if (openY > 0.0 && openY < 1.0) {
+                                        float edge = smoothstep(openY * 0.5 - 0.02, openY * 0.5, abs(cc.y));
+                                        color.rgb += vec3(edge * 2.0);
+                                    } else if (openX > 0.0 && openX < 1.0) {
+                                        float edge = smoothstep(openX * 0.5 - 0.1, openX * 0.5, abs(cc.x));
+                                        color.rgb = vec3(edge * 3.0);
+                                    }
+                                }
+                            }
+
                             gl_FragColor = color;
                         }
                     `
-                });
+            });
 
-                const geometry = new THREE.PlaneGeometry(2, 2);
-                const mesh = new THREE.Mesh(geometry, material);
-                scene.add(mesh);
+            const geometry = new THREE.PlaneGeometry(2, 2);
+            const mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
 
-                // 5. Scroll Sync & Interaction Sync
-                window.addEventListener('scroll', () => {
-                    uniforms.u_scroll.value = window.scrollY / pageHeight;
-                });
+            // 5. Scroll Sync & Interaction Sync
+            window.addEventListener('scroll', () => {
+                uniforms.u_scroll.value = window.scrollY / pageHeight;
+            });
 
-                window.addEventListener('mousemove', (e) => {
-                    uniforms.u_mouse.value.x = e.clientX / window.innerWidth;
-                    uniforms.u_mouse.value.y = 1.0 - (e.clientY / window.innerHeight);
-                });
+            // Custom Cursor Logic
+            const cursorDot = document.querySelector('.custom-cursor-dot');
+            const cursorOutline = document.querySelector('.custom-cursor-outline');
+            let outlineX = window.innerWidth / 2;
+            let outlineY = window.innerHeight / 2;
+            let mouseX = outlineX;
+            let mouseY = outlineY;
+            let isHovering = false;
 
-                const buttons = document.querySelectorAll('.crt-btn, .theme-btn, .link');
-                let targetHover = 0.0;
-                buttons.forEach(btn => {
-                    btn.addEventListener('mouseenter', () => targetHover = 1.0);
-                    btn.addEventListener('mouseleave', () => targetHover = 0.0);
-                });
+            window.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
 
-                // 6. Render Loop
-                const clock = new THREE.Clock();
-                function animate() {
-                    requestAnimationFrame(animate);
-                    uniforms.u_time.value = clock.getElapsedTime();
-                    
-                    // Smoothly interpolate hover state much faster
-                    uniforms.u_hover.value += (targetHover - uniforms.u_hover.value) * 0.8;
-                    
-                    renderer.render(scene, camera);
+                // Only track u_mouse for the shader when hovering.
+                // This "freezes" the glitch effect position on the button when moving away!
+                if (isHovering) {
+                    uniforms.u_mouse.value.x = mouseX / window.innerWidth;
+                    uniforms.u_mouse.value.y = 1.0 - (mouseY / window.innerHeight);
                 }
-                animate();
 
-                // 7. Resize Handler (Basic update)
-                window.addEventListener('resize', () => {
-                    renderer.setSize(window.innerWidth, window.innerHeight);
-                    uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight);
+                if (cursorDot) {
+                    cursorDot.style.left = `${mouseX}px`;
+                    cursorDot.style.top = `${mouseY}px`;
+                }
+            });
+
+            const buttons = document.querySelectorAll('.crt-btn, .theme-btn, .link, a, button');
+            let targetHover = 0.0;
+            let hoverTimeout;
+            buttons.forEach(btn => {
+                btn.addEventListener('mouseenter', () => {
+                    clearTimeout(hoverTimeout);
+                    targetHover = 1.0;
+                    isHovering = true;
+                    // Instantly snap the glitch to the current mouse pos
+                    uniforms.u_mouse.value.x = mouseX / window.innerWidth;
+                    uniforms.u_mouse.value.y = 1.0 - (mouseY / window.innerHeight);
+                    if (cursorOutline) cursorOutline.classList.add('hover');
+
+                    // Automatically stop the glitch after 1.4s while still hovering
+                    hoverTimeout = setTimeout(() => {
+                        targetHover = 0.0;
+                    }, 200);
+                });
+                btn.addEventListener('mouseleave', () => {
+                    clearTimeout(hoverTimeout);
+                    isHovering = false;
+                    targetHover = 0.0; // Stop glitch immediately
+                    // Revert cursor instantly so it doesn't stay big when moving away
+                    if (cursorOutline) cursorOutline.classList.remove('hover');
+                });
+            });
+
+            // 6. Render Loop
+            const clock = new THREE.Clock();
+            function animate() {
+                requestAnimationFrame(animate);
+                uniforms.u_time.value = clock.getElapsedTime();
+
+                // Smoothly interpolate hover state much faster
+                uniforms.u_hover.value += (targetHover - uniforms.u_hover.value) * 0.8;
+
+                // Animate custom cursor outline
+                outlineX += (mouseX - outlineX) * 0.2;
+                outlineY += (mouseY - outlineY) * 0.2;
+                if (cursorOutline) {
+                    cursorOutline.style.left = `${outlineX}px`;
+                    cursorOutline.style.top = `${outlineY}px`;
+                }
+
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            // 7. Resize Handler (Basic update)
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight);
+
+                // Debounce the re-capture to prevent performance issues during active resizing
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    captureDOM();
+                }, 300);
+            });
+
+            let initialCaptureDone = false;
+
+            // 8. Capture Logic
+            function captureDOM() {
+                if (!initialCaptureDone) {
+                    loader.style.display = 'flex';
+                }
+                content.style.opacity = '1';
+                const isLight = document.body.getAttribute('data-theme') === 'light';
+
+                html2canvas(content, {
+                    backgroundColor: isLight ? '#e6e6e6' : '#1a1a1a',
+                    scale: window.devicePixelRatio || 2,
+                    useCORS: true,
+                    logging: false
+                }).then(canvas => {
+                    content.style.opacity = '0';
+                    loader.style.display = 'none';
+
+                    texture.image = canvas;
+                    texture.needsUpdate = true;
+
+                    pageHeight = content.scrollHeight;
                     uniforms.u_ratio.value = window.innerHeight / pageHeight;
-                });
+                    uniforms.u_scroll.value = window.scrollY / pageHeight;
 
-                // 8. Capture Logic
-                function captureDOM() {
-                    loader.style.display = 'block';
-                    content.style.opacity = '1';
-                    const isLight = document.body.getAttribute('data-theme') === 'light';
-                    
-                    html2canvas(content, {
-                        backgroundColor: isLight ? '#e6e6e6' : '#1a1a1a',
-                        scale: window.devicePixelRatio || 2,
-                        useCORS: true,
-                        logging: false
-                    }).then(canvas => {
-                        content.style.opacity = '0';
-                        loader.style.display = 'none';
-                        
-                        texture.image = canvas;
-                        texture.needsUpdate = true;
-                        
-                        pageHeight = content.scrollHeight;
-                        uniforms.u_ratio.value = window.innerHeight / pageHeight;
-                        uniforms.u_scroll.value = window.scrollY / pageHeight;
-                    }).catch(err => {
-                        loader.innerText = "WEBGL CAPTURE FAILED";
-                        console.error("html2canvas error: ", err);
-                    });
-                }
+                    // 10. TV On Effect (Triggers when launching)
+                    if (!initialCaptureDone) {
+                        initialCaptureDone = true;
+                        let turnOnStart = clock.getElapsedTime();
+                        const turnOnDuration = 0.6; // 600ms duration
 
-                // Initial capture
-                captureDOM();
-
-                // 9. Theme toggle integration
-                const themeToggle = document.getElementById('theme-toggle');
-                themeToggle.addEventListener('click', () => {
-                    const body = document.body;
-                    if (body.getAttribute('data-theme') === 'light') {
-                        body.removeAttribute('data-theme');
-                        themeToggle.textContent = '[ MODE: DARK ]';
-                    } else {
-                        body.setAttribute('data-theme', 'light');
-                        themeToggle.textContent = '[ MODE: LIGHT ]';
+                        function runTvOn() {
+                            let now = clock.getElapsedTime();
+                            let elapsed = now - turnOnStart;
+                            if (elapsed < turnOnDuration) {
+                                uniforms.u_tv_on.value = elapsed / turnOnDuration;
+                                requestAnimationFrame(runTvOn);
+                            } else {
+                                uniforms.u_tv_on.value = 1.0;
+                            }
+                        }
+                        runTvOn();
                     }
-                    captureDOM(); // Recapture the updated DOM!
+                }).catch(err => {
+                    loader.innerText = "WEBGL CAPTURE FAILED";
+                    console.error("html2canvas error: ", err);
                 });
             }
+
+            // Initial capture
+            captureDOM();
+
+            // 9. Theme toggle integration
+            const themeToggle = document.getElementById('theme-toggle');
+            themeToggle.addEventListener('click', () => {
+                const body = document.body;
+                if (body.getAttribute('data-theme') === 'light') {
+                    body.removeAttribute('data-theme');
+                    themeToggle.textContent = '[ MODE: DARK ]';
+                } else {
+                    body.setAttribute('data-theme', 'light');
+                    themeToggle.textContent = '[ MODE: LIGHT ]';
+                }
+                captureDOM(); // Recapture the updated DOM!
+            });
+        }
     </script>
 </body>
+
 </html>
